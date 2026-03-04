@@ -17,7 +17,7 @@ class Wallet(models.Model):
         ('CAD', 'CAD'),
         ('NGN', 'Naira')
     )
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='wallet')
     wallet_number = models.CharField(max_length=11, null=False, unique=True, default=generate_wallet_number)
     account_number = models.CharField(max_length=11, null=False, unique=True, default=generate_account_number)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
