@@ -5,8 +5,6 @@ from user.models import User
 from wallet.utils import generate_account_number, generate_wallet_number
 
 
-# Create your models here.
-
 class Wallet(models.Model):
     CURRENCY_TYPE = (
         ('EUR', 'Euro'),
@@ -18,7 +16,7 @@ class Wallet(models.Model):
         ('NGN', 'Naira')
     )
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='wallet')
-    wallet_number = models.CharField(max_length=11, null=False, unique=True, default=generate_wallet_number)
+    wallet_number = models.CharField(max_length=11, null=False, unique=True, primary_key=True)
     account_number = models.CharField(max_length=11, null=False, unique=True, default=generate_account_number)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     currency = models.CharField(max_length=11, choices=CURRENCY_TYPE, default='NGN')
@@ -31,7 +29,6 @@ class Transaction(models.Model):
         ("DEBIT", "Debit"),
         ("CREDIT", "Credit"),
     )
-
     STATUS_TYPE = (
         ("PENDING", "Pending"),
         ("CONFIRMED", "Confirmed"),
@@ -41,12 +38,11 @@ class Transaction(models.Model):
     reference = models.CharField(max_length=100)
     transaction_type = models.CharField(max_length=6, choices=TRANSACTION_TYPE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    sender = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='transaction_sender')
-    reciever = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='transaction_reciever')
+    sender = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='sent_transactions')
+    reciever_wallet = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='received_transactions')
     status = models.CharField(max_length=9, choices=STATUS_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    idempotency_key = models.UUIDField(unique=True, editable=False, blank=True)
+    idempotency_key = models.UUIDField(unique=True, editable=False, blank=True, null=True)
 
 
 class Ledger(models.Model):
@@ -60,6 +56,7 @@ class Ledger(models.Model):
     entry_type = models.CharField(max_length=6, choices=TRANSACTION_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
 class Receipt(models.Model):
     TRANSACTION_TYPE = (
         ("DEBIT", "Debit"),
@@ -71,12 +68,9 @@ class Receipt(models.Model):
         ("REJECTED", "Rejected"),
         ("CANCELED", "Canceled"),
     )
-
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_type = models.CharField(max_length=6, choices=TRANSACTION_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
-    sender = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='sender')
-    reciever = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='reciever')
+    sender = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='sent_receipts')
+    reciever_wallet = models.ForeignKey(Wallet, on_delete=models.PROTECT, related_name='received_receipts')
     status = models.CharField(max_length=9, choices=STATUS_TYPE)
-
-

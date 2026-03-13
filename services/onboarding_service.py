@@ -2,7 +2,7 @@ from django.db import transaction
 
 from notification.services import create_notification
 from user.models import User
-from wallet.services import create_wallet
+from wallet.services.create_wallet_service import create_wallet
 
 
 @transaction.atomic
