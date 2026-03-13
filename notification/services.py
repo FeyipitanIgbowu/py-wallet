@@ -68,3 +68,24 @@ def create_fund_notification(user, amount):
     )
     notification.is_read = True
     notification.save()
+
+
+def credit_notification(user, amount):
+    wallet = get_object_or_404(Wallet, user=user)
+    notification = Notification.objects.create(
+        wallet_number=user.wallet.wallet_number,
+        message=f"""***Deposit ALERT***
+           {amount} has been funded to your wallet,
+           your new balance is: {user.wallet.balance}
+           """,
+        event_type="Wallet Deposit Notification",
+    )
+    send_mail(
+        subject="Wallet Deposit Notification",
+        message=notification.message,
+        from_email='',
+        recipient_list=[user.email],
+        fail_silently=True
+    )
+    notification.is_read = True
+    notification.save()

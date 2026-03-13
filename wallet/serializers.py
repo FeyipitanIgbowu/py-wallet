@@ -33,3 +33,10 @@ class WalletFundSerializer(serializers.Serializer):
             raise serializers.ValidationError("You cannot fund a negative amount")
         return value
 
+class FundWalletSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate_amount(self, value):
+        if value < 0:
+            raise serializers.ValidationError("You cannot fund a negative amount")
+        return value
