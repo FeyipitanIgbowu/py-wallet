@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from notification.services import create_transfer_notification, create_fund_notification
+from services.fund_wallet_service import fund_wallet
 from services.transfer_service import create_transfer
 from wallet.models import Wallet
 from wallet.serializers import WalletTransferSerializer, WalletFundSerializer
@@ -64,6 +65,6 @@ def fund_wallet_to_wallet(request):
     user = request.user
     amount = serializer.validated_data['amount']
 
-    payment = fund_self_wallet(user, amount)
+    payment = fund_wallet(user, amount)
 
     return Response(payment, status=status.HTTP_200_OK)

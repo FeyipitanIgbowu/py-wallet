@@ -85,8 +85,11 @@ def paystack_callback(request):
 
     tx = credit_wallet(wallet, amount, reference)
     data = {
-        "reference": reference,
-        "amount": amount,
+        "reference": tx.reference,
+        "amount": tx.amount,
+        "status": tx.status,
+        "created_at": tx.created_at,
+
     }
 
     return Response({"message": "Payment Successful"}, status=status.HTTP_200_OK)
